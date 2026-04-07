@@ -531,6 +531,10 @@
     <div class="misiones-grid" id="misionesContainer"></div>
 
     <button class="reset-btn" id="resetSemanaBtn">🔄 REINICIAR SEMANA</button>
+    <div style="text-align: center; margin-top: 15px; padding: 15px; background: rgba(0,0,0,0.6); border-radius: 20px; border: 1px solid #FF003E;">
+        <button id="debugBtn" style="background: #444; border: 1px solid #888; color: white; padding: 6px 12px; border-radius: 20px; font-size: 0.75rem; cursor: pointer;">🔍 DEBUG: Ver datos guardados</button>
+        <pre id="debugOutput" style="text-align: left; color: #0f0; font-size: 0.65rem; margin-top: 10px; max-height: 150px; overflow-y: auto; background: #000; padding: 10px; border-radius: 10px; display: none;"></pre>
+    </div>
     <footer>🕷️ Miles Morales Spider-Verse 🔴 Instala en Chrome: ⋮ → Instalar</footer>
 </div>
 
@@ -848,6 +852,53 @@
     });
 
     resetBtn.addEventListener('click', reiniciarSemana);
+
+    // ===== DEBUG =====
+    const debugBtn = document.getElementById('debugBtn');
+    const debugOutput = document.getElementById('debugOutput');
+    
+    debugBtn.addEventListener('click', () => {
+        if (debugOutput.style.display === 'none') {
+            // Mostrar datos
+            let debug = '📊 DATOS EN LOCALSTORAGE:\n\n';
+            
+            // Historial
+            const hist = localStorage.getItem('cazador_historial');
+            debug += '📝 HISTORIAL:\n';
+            debug += hist ? JSON.stringify(JSON.parse(hist), null, 2) : 'Vacío\n';
+            debug += '\n';
+            
+            // Datos de cada niño
+            debug += '👤 NIÑOS GUARDADOS:\n';
+            for (let i = 0; i < localStorage.length; i++) {
+                const key = localStorage.key(i);
+                if (key.startsWith('cazador_') && key !== 'cazador_historial') {
+                    const data = localStorage.getItem(key);
+                    try {
+                        const parsed = JSON.parse(data);
+                        debug += `\n${key}:\n`;
+                        debug += `  Puntos: ${parsed.totalPuntos}\n`;
+                        debug += `  Misiones: ${parsed.misiones.length}\n`;
+                    } catch {
+                        debug += `\n${key}: [ERROR al parsear]\n`;
+                    }
+                }
+            }
+            
+            // Información del navegador
+            debug += '\n🌐 INFO DEL NAVEGADOR:\n';
+            debug += `  User Agent: ${navigator.userAgent.substring(0, 60)}...\n`;
+            debug += `  localStorage disponible: ${typeof(Storage) !== 'undefined' ? 'SÍ' : 'NO'}\n`;
+            debug += `  Modo privado/incógnito: ${navigator.privateBrowsingMode || 'Desconocido'}\n`;
+            
+            debugOutput.textContent = debug;
+            debugOutput.style.display = 'block';
+            debugBtn.textContent = '🔍 DEBUG: Ocultar datos';
+        } else {
+            debugOutput.style.display = 'none';
+            debugBtn.textContent = '🔍 DEBUG: Ver datos guardados';
+        }
+    });
 
     // Inicialización
     mostrarWelcome();
