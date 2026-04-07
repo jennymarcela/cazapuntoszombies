@@ -665,7 +665,9 @@
                 totalPuntos: totalPuntos,
                 ultimaActualizacion: new Date().toISOString()
             };
-            localStorage.setItem(getStorageKey(currentChild), JSON.stringify(estado));
+            const key = getStorageKey(currentChild);
+            localStorage.setItem(key, JSON.stringify(estado));
+            console.log(`💾 Guardado: ${key} | Puntos: ${totalPuntos}`);
             
             // Mostrar indicador de guardado
             savedIndicator.classList.add('show');
@@ -673,7 +675,8 @@
             
             return true;
         } catch(e) {
-            console.error("Error al guardar:", e);
+            console.error("❌ Error al guardar:", e);
+            alert("⚠️ Error al guardar los datos:\n" + e.message);
             return false;
         }
     }
@@ -751,6 +754,7 @@
         if (nuevosPuntos > 0) {
             totalPuntos += nuevosPuntos;
         }
+        console.log(`✅ Sumado: ${mision.nombre} | Puntos totales: ${totalPuntos}`);
         actualizarInterfaz();
     }
 
